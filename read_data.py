@@ -4,12 +4,21 @@ import numpy as np
 print(pd.__version__)
 print(np.__version__)
 
+def to_python_path(win_path: str) -> str:
+    """
+    Windows のパスを Python のエスケープ済みパスへ変換する。
+    例: "a\b\c.txt" → "a\\b\\c.txt"
+    """
+    return win_path.replace("\\", "\\\\")
+
+
 def read_csv_and_format(initial_file_1, initial_file_2, data_file_1, data_file_2):
     #csvファイル読み込み
-    if1 = pd.read_csv(initial_file_1)
-    if2 = pd.read_csv(initial_file_2)
-    df1 = pd.read_csv(data_file_1)
-    df2 = pd.read_csv(data_file_2)
+    #windowsパスをpythonパスに変換
+    if1 = to_python_path(pd.read_csv(initial_file_1))
+    if2 = to_python_path(pd.read_csv(initial_file_2))
+    df1 = to_python_path(pd.read_csv(data_file_1))
+    df2 = to_python_path(pd.read_csv(data_file_2))
 
     #データのカラム説明
     # 0 Time
@@ -48,9 +57,11 @@ def read_csv_and_format(initial_file_1, initial_file_2, data_file_1, data_file_2
     #初期データの平均値計算　数値部分のみ抜き出す
     if1_nums = if1.select_dtypes(include='number')
     if1_means = if1_nums.mean(axis=0)
+    print("--- Initial File 1 Means ---")
     print(if1_means)
     if2_nums = if2.select_dtypes(include='number')
     if2_means = if2_nums.mean(axis=0)
+    print("--- Initial File 2 Means ---")
     print(if2_means)
 
     df1_nums = df1.select_dtypes(include='number')
