@@ -15,9 +15,11 @@ def euler_to_rotation_matrix_scipy_ZYX(angles_deg):
     戻り値:
         np.array: 3x3 回転行列
     """
+    # 1124 出力される回転行列はX：pitch、Y：roll、Z：yawの順番になっている
+    # 計算順序はZYX
     # 入力の順序: (Roll, Pitch, Yaw)
     angles_rad = np.radians(angles_deg)
-    roll, pitch, yaw = angles_rad[0], angles_rad[1], angles_rad[2]
+    roll, pitch, yaw = angles_rad[1], angles_rad[0], angles_rad[2]
     
     # SciPyの 'ZYX' オイラー角順序: (Z-angle=Yaw, Y-angle=Pitch, X-angle=Roll)
     euler_scipy_order = np.array([yaw, pitch, roll])

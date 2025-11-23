@@ -12,10 +12,14 @@ def calculate_wrist_angle(data_w,data_h,init_w,init_h):
     #ToDo : データ長の不一致対応 短いほうに合わせる タイムスタンプ参照
     n = min(len(data_w), len(data_h))
     wrist_angle = np.zeros((n, 3))  # 手首角度を格納する配列 (ラジアン)
+    wrist_debug = np.zeros((n, 3))  # デバッグ用手首角度配列 (ラジアン)
+    hand_debug = np.zeros((n, 3))  # デバッグ用手の甲角度配列 (ラジアン)
+
     for i in range(n):
         # 姿勢データから手首角度を算出する
-        w_turn_deg = data_w[i][15:18]  # 例:手首のロール、ピッチ、ヨー角度
-        h_turn_deg = data_h[i][15:18]  # 例:手の甲のロール、ピッチ、ヨー角度
+        w_turn_deg = data_w[i][6:9]  # 例:手首のロール、ピッチ、ヨー角度
+        h_turn_deg = data_h[i][6:9]  # 例:手の甲のロール、ピッチ、ヨー角度
+        # print(f"Data index {i}: Wrist angles (deg): {w_turn_deg}, Hand back angles (deg): {h_turn_deg}") #読み出し位置がずれていた 修正済み
         #1.回転行列の計算
         w_turn = cm.euler_to_rotation_matrix_scipy_ZYX(w_turn_deg)
         h_turn = cm.euler_to_rotation_matrix_scipy_ZYX(h_turn_deg)
@@ -42,7 +46,11 @@ def calculate_wrist_angle(data_w,data_h,init_w,init_h):
         # print("Wrist angle (rad):", wrist_angle)
         # print("Wrist angle (deg):", np.degrees(wrist_angle))
 
-    return wrist_angle  # ラジアン値の配列を返す
+        #5.デバッグ用 wristとhandの初期状態からの角度計算
+        wrist_debug[i][0:3] = cm.rotation_matrix_to_euler_scipy_ZYX(w_i_t)
+        hand_debug[i][0:3]  = cm.rotation_matrix_to_euler_scipy_ZYX(h_i_t)
+
+    return wrist_angle, wrist_debug, hand_debug
 
 #単体でのテスト用コード
 if __name__ == "__main__":
