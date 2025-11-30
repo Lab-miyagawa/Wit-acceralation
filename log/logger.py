@@ -19,6 +19,18 @@ class ExperimentLoggerApp:
 
         self.start_time = None
 
+        # ====== データ種別 ======
+        frame_dtype = ttk.LabelFrame(root, text="データ種別")
+        frame_dtype.pack(padx=10, pady=5, fill="x")
+
+        self.data_type_var = tk.StringVar(value="計測データ")
+        ttk.Radiobutton(
+            frame_dtype, text="初期データ", variable=self.data_type_var, value="初期データ"
+        ).pack(side="left", padx=5, pady=5)
+        ttk.Radiobutton(
+            frame_dtype, text="計測データ", variable=self.data_type_var, value="計測データ"
+        ).pack(side="left", padx=5, pady=5)
+
         # ====== 曲選択 ======
         frame_music = ttk.LabelFrame(root, text="曲選択")
         frame_music.pack(padx=10, pady=5, fill="x")
@@ -89,7 +101,15 @@ class ExperimentLoggerApp:
             with open(CSV_FILE, "w", newline="", encoding="utf-8-sig") as f:
                 writer = csv.writer(f)
                 writer.writerow(
-                    ["start_time", "end_time", "duration_sec", "music", "num_players", "result"]
+                    [
+                        "start_time",
+                        "end_time",
+                        "duration_sec",
+                        "data_type",
+                        "music",
+                        "num_players",
+                        "result",
+                    ]
                 )
 
     def on_start(self):
@@ -100,7 +120,9 @@ class ExperimentLoggerApp:
 
         # JSTで現在時刻を取得
         self.start_time = datetime.now(JST)
-        self.status_var.set(f"計測中… 開始時刻: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        self.status_var.set(
+            f"計測中… 開始時刻: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}"
+        )
         self.btn_start.state(["disabled"])
         self.btn_stop.state(["!disabled"])
 
@@ -114,6 +136,7 @@ class ExperimentLoggerApp:
         end_time = datetime.now(JST)
         duration = (end_time - self.start_time).total_seconds()
 
+        data_type = self.data_type_var.get()
         music = self.music_var.get()
         num_players = self.players_var.get()
         result = self.result_var.get()
@@ -127,6 +150,7 @@ class ExperimentLoggerApp:
                         self.start_time.strftime("%Y-%m-%d %H:%M:%S"),
                         end_time.strftime("%Y-%m-%d %H:%M:%S"),
                         f"{duration:.3f}",
+                        data_type,
                         music,
                         num_players,
                         result,
@@ -138,7 +162,7 @@ class ExperimentLoggerApp:
 
         self.status_var.set(
             f"記録完了: {self.start_time.strftime('%H:%M:%S')} → {end_time.strftime('%H:%M:%S')} "
-            f"({duration:.1f} 秒) | 曲: {music}, 人数: {num_players}, 結果: {result}"
+            f"({duration:.1f} 秒) | 種別: {data_type}, 曲: {music}, 人数: {num_players}, 結果: {result}"
         )
 
         # 状態リセット
